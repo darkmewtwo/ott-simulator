@@ -1,0 +1,43 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: ott-postgres
+
+    environment:
+      POSTGRES_DB: ott
+      POSTGRES_USER: ott
+      POSTGRES_PASSWORD: ott
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./api
+
+    container_name: ott-api
+
+    ports:
+      - "8100:8100"
+
+    depends_on:
+      - postgres
+
+  streamer:
+    build:
+      context: ./streamer
+
+    container_name: ott-streamer
+
+    ports:
+      - "8180:8180"
+
+    volumes:
+      - ./media:/media
+
+volumes:
+  postgres_data:
