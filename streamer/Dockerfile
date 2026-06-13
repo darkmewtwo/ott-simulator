@@ -4,6 +4,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o streamer .
+RUN go install github.com/air-verse/air@v1.62
 
-CMD ["./streamer"]
+RUN go mod download || true
+
+# RUN go build -o streamer .
+
+# CMD ["./streamer"]

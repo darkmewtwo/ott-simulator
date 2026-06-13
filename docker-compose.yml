@@ -27,6 +27,18 @@ services:
     depends_on:
       - postgres
 
+    volumes:
+      - ./api:/app
+
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8100"
+      - --reload
+
   streamer:
     build:
       context: ./streamer
@@ -38,6 +50,9 @@ services:
 
     volumes:
       - ./media:/media
+      - ./streamer:/app
+
+    command: air
 
 volumes:
   postgres_data:

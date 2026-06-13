@@ -7,5 +7,5 @@ app = FastAPI()
 def health():
     return {
         "service": "api",
-        "status": "healthy",
+        "status": "always healthy",
     }

@@ -9,7 +9,7 @@ func health(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(
 		map[string]string{
 			"service": "streamer",
-			"status":  "we are healthy",
+			"status":  "defnitely healthy",
 		},
 	)
 }
