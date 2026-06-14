@@ -1,11 +1,7 @@
 from sqlalchemy import String, DateTime, func
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-
-
-class Base(DeclarativeBase):
-    pass
+from app.models.base import Base
 
 
 class Movie(Base):
