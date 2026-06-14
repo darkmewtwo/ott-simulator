@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from datetime import datetime
+from pydantic import BaseModel, field_serializer
 
 
 class MovieCreate(BaseModel):
@@ -12,7 +13,11 @@ class MovieResponse(BaseModel):
     title: str
     description: str | None
     filename: str
-    created_at: str
+    created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime):
+        return value.isoformat()
 
     class Config:
         from_attributes = True
