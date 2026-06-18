@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OTT Simulator</title>
+</head>
+<body>
+
+<h1>Movies</h1>
+
+<ul id="movie-list"></ul>
+
+<script>
+async function loadMovies() {
+    const response = await fetch(
+        "http://localhost:8100/movies"
+    );
+
+    const movies = await response.json();
+
+    const list = document.getElementById("movie-list");
+
+    movies.forEach(movie => {
+        const li = document.createElement("li");
+
+        li.innerHTML =
+            `<a href="/player.html?id=${movie.id}">
+                ${movie.title}
+            </a>`;
+
+        list.appendChild(li);
+    });
+}
+
+loadMovies();
+</script>
+
+</body>
+</html>
