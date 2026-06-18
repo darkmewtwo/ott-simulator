@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Player</title>
+</head>
+<body>
+
+<h1 id="title"></h1>
+
+<video
+    id="video-player"
+    width="900"
+    controls>
+</video>
+
+<script>
+const params =
+    new URLSearchParams(window.location.search);
+
+const movieId = params.get("id");
+
+async function loadMovie() {
+
+    const response = await fetch(
+        `http://localhost:8100/movies/${movieId}`
+    );
+
+    const movie = await response.json();
+
+    document.getElementById("title").innerText =
+        movie.title;
+
+    const player =
+        document.getElementById("video-player");
+
+    player.src = movie.stream_url;
+}
+
+loadMovie();
+</script>
+
+</body>
+</html>

@@ -54,5 +54,14 @@ services:
 
     command: air
 
+  frontend:
+    build:
+      context: ./frontend
+
+    container_name: ott-frontend
+
+    ports:
+      - "3000:80"
+
 volumes:
   postgres_data:
