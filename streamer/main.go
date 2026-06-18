@@ -2,20 +2,51 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 )
 
-func health(w http.ResponseWriter, r *http.Request) {
+const mediaDir = "/media"
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(
 		map[string]string{
 			"service": "streamer",
 			"status":  "defnitely healthy",
 		},
 	)
+	// w.Header().Set("Content-Type", "application/json")
+	// w.Write([]byte(`{
+	// 	"service":"streamer",
+	// 	"status":"healthy"
+	// }`))
+}
+
+func streamHandler(w http.ResponseWriter, r *http.Request) {
+	filename := filepath.Base(r.PathValue("filename"))
+
+	fullPath := filepath.Join(mediaDir, filename)
+
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		http.NotFound(w, r)
+		return
+	}
+
+	http.ServeFile(w, r, fullPath)
 }
 
 func main() {
-	http.HandleFunc("/health", health)
+	mux := http.NewServeMux()
 
-	http.ListenAndServe(":8180", nil)
+	mux.HandleFunc("GET /health", healthHandler)
+	mux.HandleFunc("GET /stream/{filename}", streamHandler)
+
+	log.Println("Streamer listening on :8180")
+
+	err := http.ListenAndServe(":8180", mux)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
