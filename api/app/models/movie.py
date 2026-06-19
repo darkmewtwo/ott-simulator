@@ -1,6 +1,7 @@
 from sqlalchemy import String, DateTime, func
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from app.config import settings
 from app.models.base import Base
 
 
@@ -19,3 +20,11 @@ class Movie(Base):
         DateTime(timezone=True),
         server_default=func.now(),
     )
+
+    poster_filename: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    @property
+    def poster_url(self):
+        if not self.poster_filename:
+            return None
+        return f"{settings.STREAM_BASE_URL}/posters/{self.poster_filename}"

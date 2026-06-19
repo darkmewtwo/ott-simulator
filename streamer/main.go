@@ -8,7 +8,8 @@ import (
 	"path/filepath"
 )
 
-const mediaDir = "/media"
+const mediaDir = "/media/movies"
+const posterDir = "/media/posters"
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(
@@ -37,11 +38,25 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, fullPath)
 }
 
+func posterHandler(w http.ResponseWriter, r *http.Request) {
+	filename := filepath.Base(r.PathValue("filename"))
+
+	fullPath := filepath.Join(posterDir, filename)
+
+	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+		http.NotFound(w, r)
+		return
+	}
+
+	http.ServeFile(w, r, fullPath)
+}
+
 func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /health", healthHandler)
 	mux.HandleFunc("GET /stream/{filename}", streamHandler)
+	mux.HandleFunc("GET /posters/{filename}", posterHandler)
 
 	log.Println("Streamer listening on :8180")
 

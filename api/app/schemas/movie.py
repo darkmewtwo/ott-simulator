@@ -14,6 +14,7 @@ class MovieBaseResponse(BaseModel):
     description: str | None
     filename: str
     created_at: datetime
+    poster_filename: str | None
 
     @field_serializer("created_at")
     def serialize_created_at(self, value: datetime):
@@ -23,7 +24,7 @@ class MovieBaseResponse(BaseModel):
 
 
 class MovieResponse(MovieBaseResponse):
-    pass
+    poster_url: str | None
 
 
 class MovieDetailsResponse(MovieBaseResponse):

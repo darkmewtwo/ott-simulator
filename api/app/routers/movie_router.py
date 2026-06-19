@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Form, File, UploadFile
 from sqlalchemy.orm import Session
+from typing import Optional
 
 from app.dependencies import get_db
 from app.repositories.movie_repository import MovieRepository
@@ -33,11 +34,13 @@ def create_movie(payload: MovieCreate, service: MovieService = Depends(get_servi
 def upload_movie(
     title: str = Form(...),
     description: str = Form(""),
-    file: UploadFile = File(...),
+    video_file: UploadFile = File(...),
+    poster_file: Optional[UploadFile] = File(None),
     service: MovieService = Depends(get_service),
 ):
     return service.upload_movie(
         title=title,
         description=description,
-        file=file,
+        file=video_file,
+        poster_file=poster_file,
     )
