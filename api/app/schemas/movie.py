@@ -7,6 +7,7 @@ class MovieCreate(BaseModel):
     description: str | None = None
     filename: str
 
+
 class MovieBaseResponse(BaseModel):
     id: int
     title: str

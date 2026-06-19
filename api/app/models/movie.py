@@ -7,19 +7,13 @@ from app.models.base import Base
 class Movie(Base):
     __tablename__ = "movies"
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True
-    )
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    title: Mapped[str] = mapped_column(
-        String(255)
-    )
+    title: Mapped[str] = mapped_column(String(255))
 
     description: Mapped[str | None]
 
-    filename: Mapped[str] = mapped_column(
-        String(255)
-    )
+    filename: Mapped[str] = mapped_column(String(255))
 
     created_at: Mapped[str] = mapped_column(
         DateTime(timezone=True),

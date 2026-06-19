@@ -4,7 +4,6 @@ from app.models.movie import Movie
 
 
 class MovieRepository:
-
     def __init__(self, db: Session):
         self.db = db
 
