@@ -29,6 +29,7 @@ services:
 
     volumes:
       - ./api:/app
+      - ./media:/media
 
     command:
       - uvicorn

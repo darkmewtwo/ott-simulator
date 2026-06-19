@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form, File, UploadFile
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
@@ -27,3 +27,17 @@ def get_movie(movie_id: int, service: MovieService = Depends(get_service)):
 @router.post("", response_model=MovieResponse)
 def create_movie(payload: MovieCreate, service: MovieService = Depends(get_service)):
     return service.create_movie(payload)
+
+
+@router.post("/upload", response_model=MovieResponse)
+def upload_movie(
+    title: str = Form(...),
+    description: str = Form(""),
+    file: UploadFile = File(...),
+    service: MovieService = Depends(get_service),
+):
+    return service.upload_movie(
+        title=title,
+        description=description,
+        file=file,
+    )
