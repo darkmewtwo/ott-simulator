@@ -10,7 +10,8 @@ from app.repositories.movie_repository import MovieRepository
 from app.schemas.movie import MovieCreate
 
 
-MEDIA_DIR = Path("/media")
+MEDIA_DIR = Path("/media/movies")
+POSTER_DIR = Path("/media/posters")
 
 
 class MovieService:
@@ -40,29 +41,43 @@ class MovieService:
         title: str,
         description: str,
         file: UploadFile,
+        poster_file: UploadFile | None = None,
     ):
-
-        if not file.filename:
+        video_file = file
+        if not video_file.filename:
             raise HTTPException(
                 status_code=400,
                 detail="No file provided",
             )
 
-        extension = Path(file.filename).suffix
+        video_extension = Path(video_file.filename).suffix
 
-        filename = f"{uuid.uuid4()}{extension}"
+        video_filename = f"{uuid.uuid4()}{video_extension}"
 
         MEDIA_DIR.mkdir(exist_ok=True)
 
-        filepath = MEDIA_DIR / filename
+        filepath = MEDIA_DIR / video_filename
 
         with open(filepath, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            shutil.copyfileobj(video_file.file, buffer)
+
+        poster_filename = None
+
+        if poster_file and poster_file.filename:
+            poster_extension = Path(poster_file.filename).suffix
+
+            poster_filename = f"{uuid.uuid4()}{poster_extension}"
+
+            poster_filepath = POSTER_DIR / poster_filename
+
+            with open(poster_filepath, "wb") as buffer:
+                shutil.copyfileobj(poster_file.file, buffer)
 
         movie = Movie(
             title=title,
             description=description,
-            filename=filename,
+            filename=video_filename,
+            poster_filename=poster_filename,
         )
 
         return self.repo.create_movie(movie)

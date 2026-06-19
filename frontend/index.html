@@ -2,14 +2,17 @@
 <html>
 <head>
     <title>OTT Simulator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+
 <h1>Movies</h1>
 
-<ul id="movie-list"></ul>
+<div id="movie-list" class="movie-grid"></div>
 
 <script>
+
 async function loadMovies() {
     const response = await fetch(
         "http://localhost:8100/movies"
@@ -20,14 +23,28 @@ async function loadMovies() {
     const list = document.getElementById("movie-list");
 
     movies.forEach(movie => {
-        const li = document.createElement("li");
+        const card = document.createElement("div");
 
-        li.innerHTML =
-            `<a href="/player.html?id=${movie.id}">
-                ${movie.title}
-            </a>`;
+        card.className = "movie-card";
 
-        list.appendChild(li);
+        card.innerHTML = `
+            <a href="/player.html?id=${movie.id}">
+                ${movie.poster_url
+                ? `<img
+                            src="${movie.poster_url}"
+                            alt="${movie.title}"
+                            class="movie-poster"
+                        >`
+                : `<div class="poster-placeholder">
+                            No Poster
+                           </div>`
+                }
+
+                <h3>${movie.title}</h3>
+            </a>
+        `;
+
+        list.appendChild(card);
     });
 }
 
