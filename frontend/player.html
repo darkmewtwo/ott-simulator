@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>OTT Simulator</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>OTT Simulator</title>
     
-    <style>
+        <style>
         body {
             font-family: Arial, sans-serif;
             background: #141414;
@@ -51,27 +51,27 @@
             line-height: 1.6;
         }
     </style>
-</head>
+    </head>
 
-<body>
+    <body>
 
-<div class="container">
+        <div class="container">
 
-    <div class="navbar">
-        <a href="/">← Back to Catalog</a>
-    </div>
+            <div class="navbar">
+                <a href="/">← Back to Catalog</a>
+            </div>
 
-    <h1 id="title"></h1>
+            <h1 id="title"></h1>
 
-    <video id="video-player" controls>
-    </video>
+            <video id="video-player" controls>
+            </video>
 
-    <p id="description" class="description">
-    </p>
-    
-    </div>
+            <p id="description" class="description">
+            </p>
+            
+            </div>
 
-<script>
+        <script>
 const params =
     new URLSearchParams(window.location.search);
 
@@ -95,10 +95,104 @@ async function loadMovie() {
         document.getElementById("video-player");
 
     player.src = movie.stream_url;
-}
+
+        // play event
+        player.addEventListener(
+            "play",
+            () => {
+
+                sendWatchEvent(
+                    "PLAY",
+                    player.currentTime,
+                );
+            }
+        );
+        // pause event
+        player.addEventListener(
+            "pause",
+            () => {
+
+                sendWatchEvent(
+                    "PAUSE",
+                    player.currentTime,
+                );
+            }
+        );
+        //  complete event
+        player.addEventListener(
+            "ended",
+            () => {
+
+                sendWatchEvent(
+                    "COMPLETE",
+                    player.duration,
+                );
+            }
+        );
+
+        // seek event
+        player.addEventListener(
+            "seeked",
+            () => {
+
+                sendWatchEvent(
+                    "SEEK",
+                    player.currentTime,
+                );
+            }
+        );
+    }
+
+    async function sendWatchEvent(
+        eventType,
+        positionSeconds,
+    ) {
+
+        const token =
+            localStorage.getItem("token");
+
+        if (!token) {
+            return;
+        }
+
+                        try {
+
+                            await fetch(
+                                "http://localhost:8100/events",
+                                {
+                                    method: "POST",
+
+                                    headers: {
+                                        "Content-Type":
+                                            "application/json",
+
+                                        Authorization:
+                                            `Bearer ${token}`,
+                                    },
+
+                                    body: JSON.stringify({
+                                        movie_id: Number(movieId),
+                                        event_type: eventType,
+                                        position_seconds:
+                                            Math.floor(
+                                                positionSeconds
+                                            ),
+                                    }),
+                                }
+                            );
+
+                        } catch (error) {
+
+                            console.error(
+                                "Failed to send event",
+                                error,
+                            );
+                        }
+                    }
+                
 
 loadMovie();
 </script>
 
-</body>
+    </body>
 </html>
