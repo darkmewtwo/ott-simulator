@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.movie_router import router as movie_router
+from app.routers.auth_router import router as auth_router
 
 
 # Will be replaced with Alembic migrations in the future, but for now we can create the tables here
@@ -21,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(movie_router)
+app.include_router(auth_router)
 
 
 @app.get("/health")
