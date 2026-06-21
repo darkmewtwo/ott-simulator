@@ -1,55 +1,153 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>OTT Simulator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
+    <div id="auth-section"></div>
 
-<h1>Movies</h1>
 
-<div id="movie-list" class="movie-grid"></div>
+    <h1>Movies</h1>
 
-<script>
+    <div id="movie-list" class="movie-grid"></div>
 
-async function loadMovies() {
-    const response = await fetch(
-        "http://localhost:8100/movies"
-    );
+    <script>
 
-    const movies = await response.json();
+            async function loadMovies() {
+                const response = await fetch(
+                    "http://localhost:8100/movies"
+                );
 
-    const list = document.getElementById("movie-list");
+            const movies = await response.json();
 
-    movies.forEach(movie => {
-        const card = document.createElement("div");
+            const list = document.getElementById("movie-list");
 
-        card.className = "movie-card";
+            movies.forEach(movie => {
+                const card = document.createElement("div");
 
-        card.innerHTML = `
+                card.className = "movie-card";
+
+                card.innerHTML = `
             <a href="/player.html?id=${movie.id}">
                 ${movie.poster_url
-                ? `<img
+                    ? `<img
                             src="${movie.poster_url}"
                             alt="${movie.title}"
                             class="movie-poster"
                         >`
-                : `<div class="poster-placeholder">
+                    : `<div class="poster-placeholder">
                             No Poster
                            </div>`
-                }
+                    }
 
                 <h3>${movie.title}</h3>
             </a>
         `;
 
-        list.appendChild(card);
-    });
-}
+                list.appendChild(card);
+            });
+        }
 
-loadMovies();
-</script>
+            async function loadCurrentUser() {
+
+                const token =
+                    localStorage.getItem("token");
+
+                if (!token) {
+                    renderLoggedOut();
+                    return;
+                }
+
+                try {
+
+                    const response = await fetch(
+                        "http://localhost:8100/auth/me",
+                        {
+                            headers: {
+                                Authorization:
+                                    `Bearer ${token}`
+                            }
+                        }
+                    );
+
+                    if (!response.ok) {
+                        localStorage.removeItem(
+                            "token"
+                        );
+
+                        renderLoggedOut();
+                        return;
+                    }
+
+                    const user =
+                        await response.json();
+
+                    renderLoggedIn(user);
+
+                } catch {
+
+                    renderLoggedOut();
+                }
+            }
+
+            function renderLoggedOut() {
+
+                document.getElementById(
+                    "auth-section"
+                ).innerHTML = `
+        <a href="/login.html">
+            Login
+        </a>
+
+        |
+
+        <a href="/register.html">
+            Register
+        </a>
+    `;
+            }
+
+            function renderLoggedIn(user) {
+
+                document.getElementById(
+                    "auth-section"
+                ).innerHTML = `
+        Welcome ${user.username}
+        |
+        <a href="#" id="logout-link">
+            Logout
+        </a>
+    `;
+
+                document
+                    .getElementById(
+                        "logout-link"
+                    )
+                    .addEventListener(
+                        "click",
+                        logout
+                    );
+            }
+
+            function logout(event) {
+
+                event.preventDefault();
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                window.location.reload();
+            }
+
+            loadCurrentUser();
+            loadMovies();
+        </script>
 
 </body>
+
 </html>
