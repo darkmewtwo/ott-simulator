@@ -10,9 +10,7 @@ from app.services.auth_service import AuthService
 
 from app.schemas.user import TokenResponse, UserCreate, UserLogin, UserResponse
 
-from app.core.dependencies import (
-    get_current_user,
-)
+from app.core.dependencies import get_current_user
 
 from app.models.user import User
 
