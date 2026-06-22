@@ -77,3 +77,8 @@ h1 {
     padding: 12px;
     cursor: pointer;
 }
+.watch-progress {
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #b3b3b3;
+}

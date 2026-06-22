@@ -9,7 +9,7 @@ from app.repositories.watch_progress_repository import (
     WatchProgressRepository,
 )
 
-from app.schemas.watch_progress import WatchProgressResponse
+from app.schemas.watch_progress import ContinueWatchingResponse, WatchProgressResponse
 
 from app.services.watch_progress_service import WatchProgressService
 
@@ -36,7 +36,7 @@ def get_progress(
     return service.get_user_progress(current_user)
 
 
-@router.get("/{movie_id}", response_model=WatchProgressResponse | None)
+@router.get("/movie/{movie_id}", response_model=WatchProgressResponse | None)
 def get_movie_progress(
     movie_id: int,
     current_user: User = Depends(get_current_user),
@@ -45,4 +45,24 @@ def get_movie_progress(
     return service.get_movie_progress(
         current_user.id,
         movie_id,
+    )
+
+
+@router.get(
+    "/continue-watching",
+    response_model=list[
+        ContinueWatchingResponse
+    ],
+)
+def continue_watching(
+    current_user: User = Depends(
+        get_current_user
+    ),
+    service: WatchProgressService =
+        Depends(get_service),
+):
+    return (
+        service.get_continue_watching(
+            current_user.id
+        )
     )

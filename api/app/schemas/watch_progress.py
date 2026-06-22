@@ -6,3 +6,14 @@ class WatchProgressResponse(BaseModel):
     last_position_seconds: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ContinueWatchingResponse(
+    BaseModel
+):
+    movie_id: int
+    title: str
+    poster_url: str | None
+    last_position_seconds: int
+
+    model_config = ConfigDict(from_attributes=True)
