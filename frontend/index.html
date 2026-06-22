@@ -1,32 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 
 <head>
     <title>OTT Simulator</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-
     <div id="auth-section"></div>
+<h2 id="continue-watching-title" style="display: none">
+    Continue Watching
+</h2>
 
+    <div id="continue-watching" class="movie-grid"></div>
 
-    <h1>Movies</h1>
+    <h1>All Movies</h1>
 
     <div id="movie-list" class="movie-grid"></div>
 
     <script>
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
 
-            async function loadMovies() {
-                const response = await fetch(
-                    "http://localhost:8100/movies"
-                );
+                const remainingSeconds = seconds % 60;
+
+                    return `${minutes}m ${remainingSeconds}s watched`;
+                }
+
+                async function loadContinueWatching() {
+                    const token = localStorage.getItem("token");
+
+                    if (!token) {
+                        return;
+                    }
+
+                    const response = await fetch(
+                "http://localhost:8100/watch_progress/continue-watching",
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                },
+            );
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const movies = await response.json();
+
+                    if (movies.length === 0) {
+                        return;
+                    }
+
+                    document.getElementById("continue-watching-title").style.display =
+                        "block";
+
+                    const container = document.getElementById("continue-watching");
+
+                    movies.forEach((movie) => {
+                        const card = document.createElement("div");
+
+                        card.className = "movie-card";
+
+                        card.innerHTML = `
+            <a href="/player.html?id=${movie.movie_id}">
+        ${movie.poster_url
+                                ? `<img
+                        src="${movie.poster_url}"
+                        alt="${movie.title}"
+                        class="movie-poster"
+                    >`
+                                : `<div class="poster-placeholder">
+                        No Poster
+                   </div>`
+                            }
+
+        <h3>${movie.title}</h3>
+
+                        <p class="watch-progress">
+            ${formatTime(movie.last_position_seconds)}
+        </p>
+
+            </a>
+        `;
+
+                        container.appendChild(card);
+                    });
+                }
+
+                async function loadMovies() {
+                    const response = await fetch("http://localhost:8100/movies");
 
             const movies = await response.json();
 
             const list = document.getElementById("movie-list");
 
-            movies.forEach(movie => {
+            movies.forEach((movie) => {
                 const card = document.createElement("div");
 
                 card.className = "movie-card";
@@ -53,52 +123,37 @@
         }
 
             async function loadCurrentUser() {
+            const token = localStorage.getItem("token");
 
-                const token =
-                    localStorage.getItem("token");
+            if (!token) {
+                renderLoggedOut();
+                return;
+            }
 
-                if (!token) {
+            try {
+                const response = await fetch("http://localhost:8100/auth/me", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    localStorage.removeItem("token");
+
                     renderLoggedOut();
                     return;
                 }
 
-                try {
+                const user = await response.json();
 
-                    const response = await fetch(
-                        "http://localhost:8100/auth/me",
-                        {
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
-
-                    if (!response.ok) {
-                        localStorage.removeItem(
-                            "token"
-                        );
-
-                        renderLoggedOut();
-                        return;
-                    }
-
-                    const user =
-                        await response.json();
-
-                    renderLoggedIn(user);
-
-                } catch {
-
-                    renderLoggedOut();
-                }
+                renderLoggedIn(user);
+            } catch {
+                renderLoggedOut();
             }
+        }
 
             function renderLoggedOut() {
-
-                document.getElementById(
-                    "auth-section"
-                ).innerHTML = `
+            document.getElementById("auth-section").innerHTML = `
         <a href="/login.html">
             Login
         </a>
@@ -109,13 +164,10 @@
             Register
         </a>
     `;
-            }
+        }
 
             function renderLoggedIn(user) {
-
-                document.getElementById(
-                    "auth-section"
-                ).innerHTML = `
+            document.getElementById("auth-section").innerHTML = `
         Welcome ${user.username}
         |
         <a href="#" id="logout-link">
@@ -123,31 +175,23 @@
         </a>
     `;
 
-                document
-                    .getElementById(
-                        "logout-link"
-                    )
-                    .addEventListener(
-                        "click",
-                        logout
-                    );
-            }
+            document
+                .getElementById("logout-link")
+                .addEventListener("click", logout);
+        }
 
             function logout(event) {
+            event.preventDefault();
 
-                event.preventDefault();
+            localStorage.removeItem("token");
 
-                localStorage.removeItem(
-                    "token"
-                );
-
-                window.location.reload();
-            }
+            window.location.reload();
+        }
 
             loadCurrentUser();
+            loadContinueWatching();
             loadMovies();
         </script>
-
 </body>
 
 </html>
