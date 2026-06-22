@@ -17,6 +17,8 @@ from app.repositories.watch_event_repository import (
     WatchEventRepository,
 )
 
+from app.repositories.watch_progress_repository import WatchProgressRepository
+
 from app.services.watch_event_service import (
     WatchEventService,
 )
@@ -37,7 +39,12 @@ def get_service(
 ):
     repo = WatchEventRepository(db)
 
-    return WatchEventService(repo)
+    progress_repo = WatchProgressRepository(db)
+
+    return WatchEventService(
+        repo,
+        progress_repo,
+    )
 
 
 @router.post(
@@ -49,6 +56,7 @@ def create_event(
     current_user: User = Depends(get_current_user),
     service: WatchEventService = Depends(get_service),
 ):
+
     return service.create_event(
         payload,
         current_user,
