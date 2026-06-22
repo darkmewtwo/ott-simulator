@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, Form, File, UploadFile
 from sqlalchemy.orm import Session
 from typing import Optional
 
+from app.core.dependencies import get_current_user
+from app.models.user import User
 from app.dependencies import get_db
 from app.repositories.movie_repository import MovieRepository
 from app.services.movie_service import MovieService
@@ -21,7 +23,11 @@ def list_movies(service: MovieService = Depends(get_service)):
 
 
 @router.get("/{movie_id}", response_model=MovieDetailsResponse)
-def get_movie(movie_id: int, service: MovieService = Depends(get_service)):
+def get_movie(
+    movie_id: int,
+    current_user: User = Depends(get_current_user),
+    service: MovieService = Depends(get_service),
+):
     return service.get_movie(movie_id)
 
 

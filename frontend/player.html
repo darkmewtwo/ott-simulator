@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>OTT Simulator</title>
+<head>
+    <meta charset="UTF-8" />
+    <title>OTT Simulator</title>
     
-        <style>
+    <style>
         body {
             font-family: Arial, sans-serif;
             background: #141414;
@@ -40,159 +40,151 @@
             background: black;
     
             border-radius: 8px;
-    
-            box-shadow:
-                0 0 20px rgba(0, 0, 0, 0.5);
-        }
-    
-        .description {
-            margin-top: 20px;
-            color: #cccccc;
-            line-height: 1.6;
-        }
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .description {
+        margin-top: 20px;
+        color: #cccccc;
+        line-height: 1.6;
+      }
     </style>
-    </head>
+</head>
 
-    <body>
+<body>
+    <div class="container">
+    <div class="navbar">
+        <a href="/">← Back to Catalog</a>
+    </div>
 
-        <div class="container">
+    <h1 id="title"></h1>
 
-            <div class="navbar">
-                <a href="/">← Back to Catalog</a>
-            </div>
+    <video id="video-player" controls></video>
 
-            <h1 id="title"></h1>
+    <p id="description" class="description"></p>
+    </div>
 
-            <video id="video-player" controls>
-            </video>
+    <script>
+        const params = new URLSearchParams(window.location.search);
 
-            <p id="description" class="description">
-            </p>
-            
-            </div>
+        const movieId = params.get("id");
 
-        <script>
-const params =
-    new URLSearchParams(window.location.search);
+        const player = document.getElementById("video-player");
 
-const movieId = params.get("id");
+        async function loadProgress(movieId) {
+            const token = localStorage.getItem("token");
 
-async function loadMovie() {
+            if (!token) {
+                return;
+            }
 
-    const response = await fetch(
-        `http://localhost:8100/movies/${movieId}`
-    );
+            const response = await fetch(
+                `http://localhost:8100/watch_progress/${movieId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                },
+            );
 
-    const movie = await response.json();
+            if (!response.ok) {
+                return;
+            }
 
-    document.getElementById("title").innerText =
-        movie.title;
+            const progress = await response.json();
 
-    document.getElementById("description").innerText =
-        movie.description;
+            if (progress) {
+                player.currentTime = progress.last_position_seconds;
+            }
+        }
 
-    const player =
-        document.getElementById("video-player");
+        async function loadMovie() {
+          const token = localStorage.getItem("token");
 
-    player.src = movie.stream_url;
+          if (!token) {
+              window.location.href = "/login.html";
+
+              return;
+          }
+          const response = await fetch(
+            `http://localhost:8100/movies/${movieId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            },
+        );
+          if (response.status === 401) {
+              localStorage.removeItem("token");
+
+            window.location.href = "/login.html";
+
+            return;
+        }
+
+          const movie = await response.json();
+
+          document.getElementById("title").innerText = movie.title;
+
+          document.getElementById("description").innerText = movie.description;
+
+          player.src = movie.stream_url;
+          // Restore watch progress
+          await new Promise((resolve) => {
+              player.addEventListener("loadedmetadata", resolve, { once: true });
+          });
+
+          await loadProgress(movieId);
 
         // play event
-        player.addEventListener(
-            "play",
-            () => {
-
-                sendWatchEvent(
-                    "PLAY",
-                    player.currentTime,
-                );
-            }
-        );
+          player.addEventListener("play", () => {
+              sendWatchEvent("PLAY", player.currentTime);
+          });
         // pause event
-        player.addEventListener(
-            "pause",
-            () => {
-
-                sendWatchEvent(
-                    "PAUSE",
-                    player.currentTime,
-                );
-            }
-        );
+          player.addEventListener("pause", () => {
+              sendWatchEvent("PAUSE", player.currentTime);
+          });
         //  complete event
-        player.addEventListener(
-            "ended",
-            () => {
-
-                sendWatchEvent(
-                    "COMPLETE",
-                    player.duration,
-                );
-            }
-        );
+          player.addEventListener("ended", () => {
+              sendWatchEvent("COMPLETE", player.duration);
+          });
 
         // seek event
-        player.addEventListener(
-            "seeked",
-            () => {
+          player.addEventListener("seeked", () => {
+              sendWatchEvent("SEEK", player.currentTime);
+          });
+      }
 
-                sendWatchEvent(
-                    "SEEK",
-                    player.currentTime,
-                );
-            }
-        );
-    }
-
-    async function sendWatchEvent(
-        eventType,
-        positionSeconds,
-    ) {
-
-        const token =
-            localStorage.getItem("token");
+        async function sendWatchEvent(eventType, positionSeconds) {
+            const token = localStorage.getItem("token");
 
         if (!token) {
             return;
         }
 
-                        try {
+          try {
+            await fetch("http://localhost:8100/events", {
+                method: "POST",
 
-                            await fetch(
-                                "http://localhost:8100/events",
-                                {
-                                    method: "POST",
+              headers: {
+                "Content-Type": "application/json",
 
-                                    headers: {
-                                        "Content-Type":
-                                            "application/json",
+                  Authorization: `Bearer ${token}`,
+              },
 
-                                        Authorization:
-                                            `Bearer ${token}`,
-                                    },
+              body: JSON.stringify({
+                  movie_id: Number(movieId),
+                  event_type: eventType,
+                position_seconds: Math.floor(positionSeconds),
+            }),
+          });
+        } catch (error) {
+              console.error("Failed to send event", error);
+          }
+      }
 
-                                    body: JSON.stringify({
-                                        movie_id: Number(movieId),
-                                        event_type: eventType,
-                                        position_seconds:
-                                            Math.floor(
-                                                positionSeconds
-                                            ),
-                                    }),
-                                }
-                            );
-
-                        } catch (error) {
-
-                            console.error(
-                                "Failed to send event",
-                                error,
-                            );
-                        }
-                    }
-                
-
-loadMovie();
-</script>
-
-    </body>
+        loadMovie();
+    </script>
+</body>
 </html>
