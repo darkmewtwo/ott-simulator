@@ -67,5 +67,23 @@ services:
     volumes:
       - ./frontend:/usr/share/nginx/html
 
+  transcoder:
+    build:
+      context: ./transcoder
+    
+    container_name: ott-transcoder
+
+    depends_on:
+      - postgres
+
+    volumes:
+      - ./media:/media
+      - ./transcoder:/app
+    
+    environment:
+      - DATABASE_URL=postgres://ott:ott@postgres:5432/ott?sslmode=disable
+    
+    command: air
+
 volumes:
   postgres_data:
