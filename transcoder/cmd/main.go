@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"transcoder/internal/db"
+	"transcoder/internal/ffmpeg"
 	"transcoder/internal/repository"
 	"transcoder/internal/worker"
 )
@@ -37,7 +38,8 @@ func main() {
 		log.Fatal(err)
 	}
 	repo := repository.NewPostgresMovieRepository(pool)
-	worker := worker.New(repo)
+	ffmpeg := ffmpeg.New("/media/movies/", "/media/hls/", "ffprobe", "ffmpeg")
+	worker := worker.New(repo, ffmpeg)
 
 	worker.Start()
 

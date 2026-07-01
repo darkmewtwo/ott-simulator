@@ -86,3 +86,37 @@ func (r *PostgresMovieRepository) UpdateStatus(
 	)
 	return err
 }
+
+func (r *PostgresMovieRepository) UpdateDuration(
+	movieID int64,
+	durationSeconds int,
+) error {
+	_, err := r.pool.Exec(
+		context.Background(),
+		`
+	UPDATE movies
+	SET duration_seconds = $1
+	WHERE id = $2
+	`,
+		durationSeconds,
+		movieID,
+	)
+	return err
+}
+
+func (r *PostgresMovieRepository) UpdateHlsPlaylistPath(
+	movieID int64,
+	hlsPlaylistPath string,
+) error {
+	_, err := r.pool.Exec(
+		context.Background(),
+		`
+	UPDATE movies
+	SET hls_playlist_path = $1
+	WHERE id = $2
+	`,
+		hlsPlaylistPath,
+		movieID,
+	)
+	return err
+}
