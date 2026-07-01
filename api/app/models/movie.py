@@ -1,6 +1,7 @@
-from sqlalchemy import String, DateTime, func
+from sqlalchemy import String, DateTime, func, Integer, text
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from app.constants.movie import MovieStatus
 from app.config import settings
 from app.models.base import Base
 
@@ -22,6 +23,21 @@ class Movie(Base):
     )
 
     poster_filename: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    duration_seconds: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
+
+    status: Mapped[MovieStatus] = mapped_column(
+    String(20),
+    nullable=False,
+    default="PENDING",
+    server_default="PENDING",
+)
+
+    hls_playlist_path: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True,
+    )
+
 
     @property
     def poster_url(self):
