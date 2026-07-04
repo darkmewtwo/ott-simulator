@@ -26,12 +26,13 @@ class MovieService:
         movie = self.repo.get_movie(movie_id)
         if not movie:
             raise HTTPException(status_code=404, detail="Movie not found")
-        
+
+        # Remaining to be moved to nginx routing 
         movie.stream_url = f"{settings.STREAM_BASE_URL}/stream/{movie.filename}"
         movie.hls_url = None
             
         if movie.status == MovieStatus.READY:
-            movie.hls_url = f"{settings.STREAM_BASE_URL}/hls/{movie.id}/index.m3u8"
+            movie.hls_url = f"/hls/{movie.id}/index.m3u8"
         
         return movie
 

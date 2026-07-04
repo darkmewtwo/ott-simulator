@@ -36,7 +36,7 @@
                     }
 
                     const response = await fetch(
-                "http://localhost:8100/watch_progress/continue-watching",
+                        "/api/watch_progress/continue-watching",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -91,7 +91,7 @@
                 }
 
     async function loadMovies() {
-        const response = await fetch("http://localhost:8100/movies");
+        const response = await fetch("/api/movies");
     const movies = await response.json();
 
     const list = document.getElementById("movie-list");
@@ -181,7 +181,7 @@
                 return;
             }
             try {
-                const response = await fetch("http://localhost:8100/auth/me", {
+                const response = await fetch("/api/auth/me", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },

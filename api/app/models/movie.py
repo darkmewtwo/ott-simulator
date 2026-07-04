@@ -43,4 +43,4 @@ class Movie(Base):
     def poster_url(self):
         if not self.poster_filename:
             return None
-        return f"{settings.STREAM_BASE_URL}/posters/{self.poster_filename}"
+        return f"/posters/{self.poster_filename}"
