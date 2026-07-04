@@ -75,8 +75,32 @@
 
         const movieId = params.get("id");
 
-        const player = videojs("video-player");
+        const player = videojs("video-player", {
+            html5: {
+                vhs: {
+                    overrideNative: true,
+                },
+            },
+        });
 
+        if (videojs.Vhs && videojs.Vhs.xhr) {
+
+            videojs.Vhs.xhr.beforeRequest = function (options) {
+
+                const token = localStorage.getItem("token");
+
+
+                if (token) {
+                    options.headers = {
+                        ...options.headers,
+                        Authorization: `Bearer ${token}`,
+                    };
+                }
+
+
+            return options;
+        };
+    }
         async function loadProgress(movieId) {
 
             const token = localStorage.getItem("token");
