@@ -82,3 +82,50 @@ h1 {
     font-size: 0.9rem;
     color: #b3b3b3;
 }
+.movie-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.movie-disabled .movie-poster,
+.movie-disabled .poster-placeholder {
+    filter: grayscale(40%);
+}
+
+.movie-status {
+    margin-top: 8px;
+    margin-bottom: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f0ad4e;
+}
+
+.movie-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.movie-status svg {
+    width: 16px;
+    height: 16px;
+}
+
+.movie-status-pending {
+    color: #2563eb;
+}
+
+.movie-status-processing {
+    color: #f59e0b;
+}
+
+.movie-status-ready {
+    color: #16a34a;
+}
+
+.movie-status-failed {
+    color: #dc2626;
+}

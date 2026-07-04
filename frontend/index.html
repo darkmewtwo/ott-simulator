@@ -1,24 +1,25 @@
 <!doctype html>
 <html>
 
-<head>
-    <title>OTT Simulator</title>
-    <link rel="stylesheet" href="styles.css" />
-</head>
+    <head>
+        <title>OTT Simulator</title>
+        <link rel="stylesheet" href="styles.css" />
+        <script src="https://unpkg.com/lucide@latest"></script>
+    </head>
 
-<body>
-    <div id="auth-section"></div>
-<h2 id="continue-watching-title" style="display: none">
-    Continue Watching
-</h2>
+    <body>
+        <div id="auth-section"></div>
+        <h2 id="continue-watching-title" style="display: none">
+            Continue Watching
+        </h2>
 
-    <div id="continue-watching" class="movie-grid"></div>
+        <div id="continue-watching" class="movie-grid"></div>
 
-    <h1>All Movies</h1>
+        <h1>All Movies</h1>
 
-    <div id="movie-list" class="movie-grid"></div>
+        <div id="movie-list" class="movie-grid"></div>
 
-    <script>
+        <script>
             function formatTime(seconds) {
                 const minutes = Math.floor(seconds / 60);
 
@@ -89,38 +90,88 @@
                     });
                 }
 
-                async function loadMovies() {
-                    const response = await fetch("http://localhost:8100/movies");
+    async function loadMovies() {
+        const response = await fetch("http://localhost:8100/movies");
+    const movies = await response.json();
 
-            const movies = await response.json();
+    const list = document.getElementById("movie-list");
+    list.innerHTML = "";
 
-            const list = document.getElementById("movie-list");
+    const MovieStatus = {
+        PENDING: "PENDING",
+        PROCESSING: "PROCESSING",
+        READY: "READY",
+        FAILED: "FAILED",
+    };
 
-            movies.forEach((movie) => {
-                const card = document.createElement("div");
+    const MovieStatusLabel = {
+        PENDING: {
+            icon: "upload",
+            text: "Uploading",
+        },
+        PROCESSING: {
+            icon: "loader-circle",
+            text: "Processing",
+        },
+        FAILED: {
+            icon: "circle-x",
+            text: "Failed",
+        },
+    };
 
-                card.className = "movie-card";
+    movies.forEach((movie) => {
+        const card = document.createElement("div");
+        card.className = "movie-card";
 
-                card.innerHTML = `
-            <a href="/player.html?id=${movie.id}">
-                ${movie.poster_url
-                    ? `<img
-                            src="${movie.poster_url}"
-                            alt="${movie.title}"
-                            class="movie-poster"
-                        >`
-                    : `<div class="poster-placeholder">
-                            No Poster
-                           </div>`
-                    }
+        const poster = movie.poster_url
+            ? `
+                <img
+                    src="${movie.poster_url}"
+                    alt="${movie.title}"
+                    class="movie-poster"
+                >
+            `
+            : `
+                <div class="poster-placeholder">
+                    No Poster
+                </div>
+            `;
+
+        if (movie.transcoding_status === MovieStatus.READY) {
+            card.innerHTML = `
+                <a href="/player.html?id=${movie.id}">
+                    ${poster}
+                    <h3>${movie.title}</h3>
+                </a>
+            `;
+        } else {
+            card.classList.add("movie-disabled");
+
+            const status =
+                MovieStatusLabel[movie.transcoding_status] ?? {
+                    icon: "circle-help",
+                    text: movie.transcoding_status,
+                };
+
+            card.innerHTML = `
+                ${poster}
+
+                <div class="movie-status movie-status-${movie.transcoding_status.toLowerCase()}">
+                    <i data-lucide="${status.icon}"></i>
+                    <span>${status.text}</span>
+                </div>
 
                 <h3>${movie.title}</h3>
-            </a>
-        `;
-
-                list.appendChild(card);
-            });
+            `;
         }
+
+        list.appendChild(card);
+    });
+
+    // Replace all <i data-lucide="..."> with SVGs
+    lucide.createIcons();
+}
+
 
             async function loadCurrentUser() {
             const token = localStorage.getItem("token");
@@ -129,7 +180,6 @@
                 renderLoggedOut();
                 return;
             }
-
             try {
                 const response = await fetch("http://localhost:8100/auth/me", {
                     headers: {
@@ -192,6 +242,6 @@
             loadContinueWatching();
             loadMovies();
         </script>
-</body>
+    </body>
 
 </html>

@@ -200,7 +200,7 @@ Viewing History
    ↓
 Recommendations
 
-Simulator Service
+Simulator Service(autonomus users)
    ↓
 100 → 500 → 1000 Users
    ↓

@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, field_serializer, ConfigDict
+from pydantic import BaseModel, Field, field_serializer, ConfigDict
 
 
 class MovieCreate(BaseModel):
@@ -15,6 +15,8 @@ class MovieBaseResponse(BaseModel):
     filename: str
     created_at: datetime
     poster_filename: str | None
+    transcoding_status: str = Field(validation_alias="status")
+
 
     @field_serializer("created_at")
     def serialize_created_at(self, value: datetime):
@@ -29,6 +31,7 @@ class MovieResponse(MovieBaseResponse):
 
 class MovieDetailsResponse(MovieBaseResponse):
     stream_url: str
+    hls_url: str
 
 
 # class MovieResponse(BaseModel):
