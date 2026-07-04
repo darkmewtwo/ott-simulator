@@ -4,6 +4,7 @@ import uuid
 
 from fastapi import HTTPException, UploadFile
 
+from app.constants.movie import MovieStatus
 from app.config import settings
 from app.models.movie import Movie
 from app.repositories.movie_repository import MovieRepository
@@ -23,9 +24,15 @@ class MovieService:
 
     def get_movie(self, movie_id: int):
         movie = self.repo.get_movie(movie_id)
-        movie.stream_url = f"{settings.STREAM_BASE_URL}/stream/{movie.filename}"
         if not movie:
             raise HTTPException(status_code=404, detail="Movie not found")
+        
+        movie.stream_url = f"{settings.STREAM_BASE_URL}/stream/{movie.filename}"
+        movie.hls_url = None
+            
+        if movie.status == MovieStatus.READY:
+            movie.hls_url = f"{settings.STREAM_BASE_URL}/hls/{movie.id}/index.m3u8"
+        
         return movie
 
     def create_movie(self, payload: MovieCreate):
