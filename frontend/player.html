@@ -110,7 +110,7 @@
             }
 
             const response = await fetch(
-                `http://localhost:8100/watch_progress/movie/${movieId}`,
+                `/api/watch_progress/movie/${movieId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -141,7 +141,7 @@
             }
 
             const response = await fetch(
-                `http://localhost:8100/movies/${movieId}`,
+                `/api/movies/${movieId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -232,7 +232,7 @@
                         try {
 
                         await fetch(
-                            "http://localhost:8100/events",
+                            "/api/events",
                             {
                                 method: "POST",
 
