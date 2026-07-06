@@ -50,19 +50,10 @@ def get_movie_progress(
 
 @router.get(
     "/continue-watching",
-    response_model=list[
-        ContinueWatchingResponse
-    ],
+    response_model=list[ContinueWatchingResponse],
 )
 def continue_watching(
-    current_user: User = Depends(
-        get_current_user
-    ),
-    service: WatchProgressService =
-        Depends(get_service),
+    current_user: User = Depends(get_current_user),
+    service: WatchProgressService = Depends(get_service),
 ):
-    return (
-        service.get_continue_watching(
-            current_user.id
-        )
-    )
+    return service.get_continue_watching(current_user.id)

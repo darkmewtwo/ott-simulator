@@ -8,9 +8,7 @@ class WatchProgressResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ContinueWatchingResponse(
-    BaseModel
-):
+class ContinueWatchingResponse(BaseModel):
     movie_id: int
     title: str
     poster_url: str | None

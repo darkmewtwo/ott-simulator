@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, Form, File, UploadFile
+from fastapi import APIRouter, Depends, Form, File, Response, UploadFile
 from sqlalchemy.orm import Session
 from typing import Optional
 
+from app.core.playback import create_stream_token
 from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.dependencies import get_db
@@ -25,9 +26,24 @@ def list_movies(service: MovieService = Depends(get_service)):
 @router.get("/{movie_id}", response_model=MovieDetailsResponse)
 def get_movie(
     movie_id: int,
+    response: Response,
     current_user: User = Depends(get_current_user),
     service: MovieService = Depends(get_service),
 ):
+    stream_token = create_stream_token(
+        user_id=current_user.id,
+        movie_id=movie_id,
+    )
+
+    response.set_cookie(
+        key="stream_token",
+        value=stream_token,
+        httponly=True,
+        secure=False,  # localhost
+        samesite="lax",
+        max_age=4 * 60 * 60,
+    )
+
     return service.get_movie(movie_id)
 
 

@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"streamer/internal/auth"
 	"streamer/internal/handler"
 	"streamer/internal/middleware"
+	"streamer/internal/playbackauth"
 	"streamer/internal/service"
 )
 
@@ -32,10 +32,14 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	secret := os.Getenv("SECRET_KEY")
 
-	if secret == "" {
-		log.Fatal("SECRET_KEY environment variable is not set")
+	streamSecret := os.Getenv("STREAM_SECRET_KEY")
+
+	if secret == "" || streamSecret == "" {
+		log.Fatal("SECRET_KEY or STREAM_SECRET_KEY environment variable is not set")
 	}
-	authService := auth.New([]byte(secret))
+	// authService := auth.New([]byte(secret))
+
+	playbackService := playbackauth.New(streamSecret)
 
 	mux := http.NewServeMux()
 
@@ -49,11 +53,18 @@ func main() {
 
 	mux.HandleFunc("GET /posters/{filename}", mediaHandler.StreamPoster)
 
-	mux.HandleFunc(
+	// mux.HandleFunc(
+	// 	"GET /hls/{movieID}/{filename}",
+	// 	middleware.Authentication(authService)(
+	// 		http.HandlerFunc(mediaHandler.StreamHLS),
+	// 	).ServeHTTP,
+	// )
+
+	mux.Handle(
 		"GET /hls/{movieID}/{filename}",
-		middleware.Authentication(authService)(
+		middleware.PlaybackAuthentication(playbackService)(
 			http.HandlerFunc(mediaHandler.StreamHLS),
-		).ServeHTTP,
+		),
 	)
 
 	log.Println("Streamer listening on :8180")

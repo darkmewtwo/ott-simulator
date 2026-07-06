@@ -17,7 +17,6 @@ class MovieBaseResponse(BaseModel):
     poster_filename: str | None
     transcoding_status: str = Field(validation_alias="status")
 
-
     @field_serializer("created_at")
     def serialize_created_at(self, value: datetime):
         return value.isoformat()

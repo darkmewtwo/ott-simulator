@@ -33,16 +33,12 @@ class WatchEventService:
                 position_seconds=payload.position_seconds,
                 is_completed=True,
             )
-        elif payload.event_type.value in (
-            "PAUSE",
-            "SEEK",
-            "STOP"
-        ):
+        elif payload.event_type.value in ("PAUSE", "SEEK", "STOP"):
             self.progress_repo.upsert(
                 user_id=user.id,
                 movie_id=payload.movie_id,
                 position_seconds=payload.position_seconds,
-                is_completed=False
+                is_completed=False,
             )
         event = self.repo.create(
             user_id=user.id,

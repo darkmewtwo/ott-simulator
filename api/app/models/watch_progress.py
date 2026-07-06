@@ -6,7 +6,7 @@ from sqlalchemy import (
     Integer,
     DateTime,
     UniqueConstraint,
-    Boolean
+    Boolean,
 )
 from sqlalchemy.orm import (
     Mapped,
