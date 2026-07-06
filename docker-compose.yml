@@ -55,6 +55,7 @@ services:
     
     environment:
       - SECRET_KEY=super-secret-key-change-later
+      - STREAM_SECRET_KEY=stream-secret-key-change-later
 
     command: air
 

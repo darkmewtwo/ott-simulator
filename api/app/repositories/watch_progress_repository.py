@@ -18,7 +18,7 @@ class WatchProgressRepository:
         user_id: int,
         movie_id: int,
         position_seconds: int,
-        is_completed:bool = False
+        is_completed: bool = False,
     ):
         progress = self.get_by_user_and_movie(
             user_id,
@@ -78,18 +78,13 @@ class WatchProgressRepository:
             )
             .join(
                 Movie,
-                Movie.id
-                == WatchProgress.movie_id,
+                Movie.id == WatchProgress.movie_id,
             )
             .filter(
-                WatchProgress.user_id
-                == user_id,
-                WatchProgress.is_completed == False # noqa
-                ,
+                WatchProgress.user_id == user_id,
+                WatchProgress.is_completed == False,  # noqa
             )
-            .order_by(
-                WatchProgress.updated_at.desc()
-            )
+            .order_by(WatchProgress.updated_at.desc())
             .limit(limit)
             .all()
         )

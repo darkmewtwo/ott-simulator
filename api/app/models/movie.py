@@ -24,20 +24,21 @@ class Movie(Base):
 
     poster_filename: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    duration_seconds: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))
+    duration_seconds: Mapped[int] = mapped_column(
+        Integer, default=0, server_default=text("0")
+    )
 
     status: Mapped[MovieStatus] = mapped_column(
-    String(20),
-    nullable=False,
-    default="PENDING",
-    server_default="PENDING",
-)
+        String(20),
+        nullable=False,
+        default="PENDING",
+        server_default="PENDING",
+    )
 
     hls_playlist_path: Mapped[str | None] = mapped_column(
         String,
         nullable=True,
     )
-
 
     @property
     def poster_url(self):

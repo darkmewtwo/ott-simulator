@@ -27,25 +27,19 @@ class WatchProgressService:
             movie_id,
         )
 
-
     def get_continue_watching(
         self,
         user_id: int,
     ):
         print(user_id)
-        rows = (
-            self.repo.get_continue_watching(
-                user_id
-            )
-        )
+        rows = self.repo.get_continue_watching(user_id)
 
         return [
             ContinueWatchingResponse(
                 movie_id=movie.id,
                 title=movie.title,
                 poster_url=movie.poster_url,
-                last_position_seconds=
-                    progress.last_position_seconds,
+                last_position_seconds=progress.last_position_seconds,
             )
             for progress, movie in rows
         ]
