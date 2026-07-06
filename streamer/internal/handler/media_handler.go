@@ -73,20 +73,13 @@ func (h *MediaHandler) StreamHLS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// if movieID <= 0 {
-	// 	http.Error(
-	// 		w,
-	// 		"invalid movie id",
-	// 		http.StatusBadRequest,
-	// 	)
-	// 	return
-	// }
+	path := r.PathValue("pathname")
 
-	filename := filepath.Base(r.PathValue("filename"))
+	fileName := filepath.Base(path)
 
 	fullPath, err := h.service.HLSPath(
 		movieID,
-		filename,
+		path,
 	)
 
 	if err != nil {
@@ -100,10 +93,10 @@ func (h *MediaHandler) StreamHLS(w http.ResponseWriter, r *http.Request) {
 
 	}
 	contentType := mime.TypeByExtension(
-		filepath.Ext(filename),
+		filepath.Ext(fileName),
 	)
 
-	switch filepath.Ext(filename) {
+	switch filepath.Ext(fileName) {
 	case ".m3u8":
 		contentType = "application/vnd.apple.mpegurl"
 
