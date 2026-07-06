@@ -37,7 +37,6 @@ func main() {
 	if secret == "" || streamSecret == "" {
 		log.Fatal("SECRET_KEY or STREAM_SECRET_KEY environment variable is not set")
 	}
-	// authService := auth.New([]byte(secret))
 
 	playbackService := playbackauth.New(streamSecret)
 
@@ -61,17 +60,13 @@ func main() {
 	// )
 
 	mux.Handle(
-		"GET /hls/{movieID}/{filename}",
+		"GET /hls/{movieID}/{pathname...}",
 		middleware.PlaybackAuthentication(playbackService)(
 			http.HandlerFunc(mediaHandler.StreamHLS),
 		),
 	)
 
 	log.Println("Streamer listening on :8180")
-
-	// handler := middleware.Authentication(
-	// 	authService,
-	// )(mux)
 
 	handler := middleware.CORS(
 		"http://localhost:3000",

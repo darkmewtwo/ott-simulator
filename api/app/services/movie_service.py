@@ -32,7 +32,7 @@ class MovieService:
         movie.hls_url = None
 
         if movie.status == MovieStatus.READY:
-            movie.hls_url = f"/hls/{movie.id}/index.m3u8"
+            movie.hls_url = f"/hls/{movie.hls_playlist_path}"
 
         return movie
 
