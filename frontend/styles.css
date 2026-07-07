@@ -129,3 +129,55 @@ h1 {
 .movie-status-failed {
     color: #dc2626;
 }
+#continue-watching-title {
+    margin-top: 10px;
+    margin-bottom: 18px;
+}
+
+.watch-progress-bar {
+    margin-top: 10px;
+    width: 100%;
+    height: 6px;
+    background: #3a3a3a;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.watch-progress-fill {
+    height: 100%;
+    background: #e50914;
+}
+
+.watch-meta {
+    margin-top: 8px;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: #b3b3b3;
+    font-size: 13px;
+}
+
+.resume-button {
+    margin-top: 12px;
+
+    width: 100%;
+    padding: 10px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #e50914;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s;
+}
+
+.resume-button:hover {
+    background: #f6121d;
+}

@@ -9,11 +9,11 @@
 
     <body>
         <div id="auth-section"></div>
-        <h2 id="continue-watching-title" style="display: none">
-            Continue Watching
-        </h2>
+        <section id="continue-watching-section" style="display:none">
+            <h2>Continue Watching</h2>
 
-        <div id="continue-watching" class="movie-grid"></div>
+            <div id="continue-watching" class="movie-grid"></div>
+        </section>
 
         <h1>All Movies</h1>
 
@@ -21,13 +21,15 @@
 
         <script>
             function formatTime(seconds) {
-                const minutes = Math.floor(seconds / 60);
+                const hrs = Math.floor(seconds / 3600);
+                const mins = Math.floor((seconds % 3600) / 60);
 
-                const remainingSeconds = seconds % 60;
-
-                    return `${minutes}m ${remainingSeconds}s watched`;
+                if (hrs > 0) {
+                    return `${hrs}h ${mins}m`;
                 }
 
+                return `${mins}m`;
+            }
                 async function loadContinueWatching() {
                     const token = localStorage.getItem("token");
 
@@ -35,56 +37,79 @@
                         return;
                     }
 
-                    const response = await fetch(
-                        "/api/watch_progress/continue-watching",
-                {
+                    const response = await fetch("/api/watch_progress/watch-history", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                },
-            );
+                    });
 
                     if (!response.ok) {
                         return;
                     }
 
-                    const movies = await response.json();
+                    const history = await response.json();
 
-                    if (movies.length === 0) {
+                    if (history.length === 0) {
                         return;
                     }
 
-                    document.getElementById("continue-watching-title").style.display =
-                        "block";
+                    document.getElementById("continue-watching-section").style.display = "block";
 
                     const container = document.getElementById("continue-watching");
+                    container.innerHTML = "";
 
-                    movies.forEach((movie) => {
+                    history.forEach((item) => {
+                        const movie = item.movie;
+                        const progress = item.progress;
+
                         const card = document.createElement("div");
-
                         card.className = "movie-card";
+                        const buttonText = progress.is_completed
+                            ? "Watch Again"
+                            : "Resume";
+
+                        const statusText = progress.is_completed
+                            ? "Completed"
+                            : `${progress.watch_percentage.toFixed(0)}% watched`;
 
                         card.innerHTML = `
-            <a href="/player.html?id=${movie.movie_id}">
-        ${movie.poster_url
-                                ? `<img
-                        src="${movie.poster_url}"
-                        alt="${movie.title}"
-                        class="movie-poster"
-                    >`
-                                : `<div class="poster-placeholder">
-                        No Poster
-                   </div>`
-                            }
+                            <a href="/player.html?id=${movie.id}">
+                                ${movie.poster_url
+                                ? `
+                                            <img
+                                                src="${movie.poster_url}"
+                                                alt="${movie.title}"
+                                                class="movie-poster"
+                                            >
+                                        `
+                            : `
+                                            <div class="poster-placeholder">
+                                                No Poster
+                                            </div>
+                                        `
+                                }
 
-        <h3>${movie.title}</h3>
+                                <div class="watch-progress-bar">
+                                    <div
+                                        class="watch-progress-fill"
+                                        style="width:${progress.watch_percentage}%">
+                                    </div>
+                                </div>
 
-                        <p class="watch-progress">
-            ${formatTime(movie.last_position_seconds)}
-        </p>
+                                <h3>${movie.title}</h3>
 
-            </a>
-        `;
+                                <div class="watch-meta">
+                                    <span>${statusText}</span>
+                                    <span>${formatTime(progress.last_position_seconds)}</span>
+                                </div>
+
+                                <button
+                                    class="resume-button"
+                                    onclick="event.preventDefault(); window.location='/player.html?id=${movie.id}'">
+                                    ${buttonText}
+                                </button>
+                            </a>
+                        `;
 
                         container.appendChild(card);
                     });

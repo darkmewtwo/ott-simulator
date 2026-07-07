@@ -9,7 +9,11 @@ from app.repositories.watch_progress_repository import (
     WatchProgressRepository,
 )
 
-from app.schemas.watch_progress import ContinueWatchingResponse, WatchProgressResponse
+from app.schemas.watch_progress import (
+    ContinueWatchingResponse,
+    WatchHistoryResponse,
+    WatchProgressResponse,
+)
 
 from app.services.watch_progress_service import WatchProgressService
 
@@ -57,3 +61,14 @@ def continue_watching(
     service: WatchProgressService = Depends(get_service),
 ):
     return service.get_continue_watching(current_user.id)
+
+
+@router.get(
+    "/watch-history",
+    response_model=list[WatchHistoryResponse],
+)
+def watch_history(
+    current_user: User = Depends(get_current_user),
+    service: WatchProgressService = Depends(get_service),
+):
+    return service.get_watch_history(current_user)

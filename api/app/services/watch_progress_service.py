@@ -1,4 +1,9 @@
-from app.schemas.watch_progress import ContinueWatchingResponse
+from app.schemas.watch_progress import (
+    ContinueWatchingResponse,
+    WatchHistoryMovieResponse,
+    WatchHistoryProgressResponse,
+    WatchHistoryResponse,
+)
 from app.models.user import User
 
 from app.repositories.watch_progress_repository import WatchProgressRepository
@@ -31,7 +36,6 @@ class WatchProgressService:
         self,
         user_id: int,
     ):
-        print(user_id)
         rows = self.repo.get_continue_watching(user_id)
 
         return [
@@ -40,6 +44,40 @@ class WatchProgressService:
                 title=movie.title,
                 poster_url=movie.poster_url,
                 last_position_seconds=progress.last_position_seconds,
+            )
+            for progress, movie in rows
+        ]
+
+    def get_watch_history(
+        self,
+        user: User,
+    ):
+        rows = self.repo.get_watch_history(user.id)
+
+        return [
+            WatchHistoryResponse(
+                movie=WatchHistoryMovieResponse(
+                    id=movie.id,
+                    title=movie.title,
+                    poster_url=movie.poster_url,
+                    duration_seconds=movie.duration_seconds,
+                ),
+                progress=WatchHistoryProgressResponse(
+                    last_position_seconds=progress.last_position_seconds,
+                    watch_percentage=(
+                        round(
+                            progress.last_position_seconds
+                            / movie.duration_seconds
+                            * 100,
+                            2,
+                        )
+                        if movie.duration_seconds > 0
+                        else 0
+                    ),
+                    started_at=progress.started_at,
+                    last_watched_at=progress.last_watched_at,
+                    is_completed=progress.is_completed,
+                ),
             )
             for progress, movie in rows
         ]
