@@ -7,3 +7,4 @@ class WatchEventType(str, Enum):
     SEEK = "SEEK"
     STOP = "STOP"
     COMPLETE = "COMPLETE"
+    HEARTBEAT = "HEARTBEAT"

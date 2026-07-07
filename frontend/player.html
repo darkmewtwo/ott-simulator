@@ -79,7 +79,30 @@
         src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.min.js"></script>
 
     <script>
+                                let heartbeatInterval = null;
+                                const HEARTBEAT_INTERVAL_MS = 10000;
 
+                                function startHeartbeat() {
+                                    if (heartbeatInterval) {
+                                        return;
+                                    }
+
+                                    heartbeatInterval = setInterval(() => {
+                                        sendWatchEvent(
+                                            "HEARTBEAT",
+                                            Math.floor(player.currentTime())
+                                        );
+                                    }, HEARTBEAT_INTERVAL_MS);
+                                }
+
+                                function stopHeartbeat() {
+                                    if (!heartbeatInterval) {
+                                        return;
+                                    }
+
+                            clearInterval(heartbeatInterval);
+                            heartbeatInterval = null;
+                        }
         const params = new URLSearchParams(window.location.search);
 
         const movieId = params.get("id");
@@ -155,9 +178,11 @@
             const progress = await response.json();
 
             if (progress) {
-                player.currentTime(
-                    progress.last_position_seconds,
-                );
+                if (progress.is_completed) {
+                    player.currentTime(0);
+                } else {
+                    player.currentTime(progress.last_position_seconds);
+                }
             }
         }
 
@@ -232,9 +257,12 @@
                     "PLAY",
                     player.currentTime(),
                 );
+                startHeartbeat();
+
             });
 
             player.on("pause", () => {
+                stopHeartbeat();
                 sendWatchEvent(
                     "PAUSE",
                     player.currentTime(),
@@ -242,6 +270,7 @@
             });
 
             player.on("ended", () => {
+                stopHeartbeat();
                 sendWatchEvent(
                     "COMPLETE",
                     player.duration(),
@@ -253,6 +282,9 @@
                     "SEEK",
                     player.currentTime(),
                 );
+            });
+            player.on("dispose", () => {
+                stopHeartbeat();
             });
         }
 
