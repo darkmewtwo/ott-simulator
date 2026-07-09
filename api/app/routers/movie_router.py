@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, Form, File, Response, UploadFile
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -56,6 +58,12 @@ def create_movie(payload: MovieCreate, service: MovieService = Depends(get_servi
 def upload_movie(
     title: str = Form(...),
     description: str = Form(""),
+    release_date: date | None = Form(None),
+    language: str | None = Form(None),
+    genres: list | None = Form(None),      # JSON array
+    age_rating: str | None = Form(None),
+    director: str | None = Form(None),
+    cast: list | None = Form(None),        # JSON array
     video_file: UploadFile = File(...),
     poster_file: Optional[UploadFile] = File(None),
     service: MovieService = Depends(get_service),
@@ -63,6 +71,12 @@ def upload_movie(
     return service.upload_movie(
         title=title,
         description=description,
+        release_date=release_date,
+        language=language,
+        genres=genres,
+        age_rating=age_rating,
+        director=director,
+        cast=cast,
         file=video_file,
         poster_file=poster_file,
     )

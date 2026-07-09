@@ -1,16 +1,16 @@
 <!doctype html>
 <html>
 
-<head>
-    <meta charset="UTF-8" />
-    <title>OTT Simulator</title>
+    <head>
+        <meta charset="UTF-8" />
+        <title>OTT Simulator</title>
 
-    <link href="https://vjs.zencdn.net/8.23.4/video-js.css" rel="stylesheet" />
-    
-<link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.css">
+        <link href="https://vjs.zencdn.net/8.23.4/video-js.css" rel="stylesheet" />
+        
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.css">
 
-    <style>
+        <style>
         body {
             font-family: Arial, sans-serif;
             background: #141414;
@@ -52,33 +52,50 @@
             line-height: 1.6;
         }
     </style>
-</head>
+    </head>
 
-<body>
+    <body>
 
-    <div class="container">
+        <div class="container">
 
-        <div class="navbar">
-            <a href="/">← Back to Catalog</a>
+            <div class="navbar">
+                <a href="/">← Back to Catalog</a>
+            </div>
+
+            <h1 id="title"></h1>
+
+            <div id="movie-meta" class="movie-meta"></div>
+            <video id="video-player" class="video-js vjs-big-play-centered" controls preload="auto">
+            </video>
+            
+            <div class="movie-details">
+                <div class="detail-row">
+                    <strong>Director</strong>
+                    <span id="director"></span>
+                </div>
+            
+                <div class="detail-row">
+                    <strong>Cast</strong>
+                    <span id="cast"></span>
+                </div>
+            
+                <div class="detail-row">
+                    <strong>Description</strong>
+                    <p id="description" class="description"></p>
+                </div>
+                </div>
+
         </div>
 
-        <h1 id="title"></h1>
+        <script src="https://vjs.zencdn.net/8.23.4/video.min.js"></script>
 
-        <video id="video-player" class="video-js vjs-big-play-centered" controls preload="auto"></video>
+        <script
+            src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@3.0.0/dist/videojs-contrib-quality-levels.min.js"></script>
+        
+        <script
+            src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.min.js"></script>
 
-        <p id="description" class="description"></p>
-
-    </div>
-
-    <script src="https://vjs.zencdn.net/8.23.4/video.min.js"></script>
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@3.0.0/dist/videojs-contrib-quality-levels.min.js"></script>
-    
-    <script
-        src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@2.0.0/dist/videojs-hls-quality-selector.min.js"></script>
-
-    <script>
+        <script>
                                 let heartbeatInterval = null;
                                 const HEARTBEAT_INTERVAL_MS = 10000;
 
@@ -217,7 +234,29 @@
 
             document.getElementById("title").innerText =
                 movie.title;
+            const meta = [
+                movie.release_date?.substring(0, 4),
+                movie.language,
+                movie.age_rating,
+            ]
+                .filter(Boolean)
+                .join(" | ");
 
+            const genres = movie.genres?.join(" | ");
+
+            document.getElementById("movie-meta").textContent =
+                [genres, meta]
+                    .filter(Boolean)
+                    .join("   ");
+
+            document.getElementById("director").textContent =
+                movie.director ?? "-";
+
+            document.getElementById("cast").textContent =
+                movie.cast?.join(", ") ?? "-";
+
+            document.getElementById("description").textContent =
+                movie.description ?? "";
             document.getElementById("description").innerText =
                 movie.description;
 
@@ -333,6 +372,6 @@
 
     </script>
 
-</body>
+    </body>
 
 </html>

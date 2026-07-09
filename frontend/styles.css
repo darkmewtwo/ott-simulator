@@ -181,3 +181,63 @@ h1 {
 .resume-button:hover {
     background: #f6121d;
 }
+.movie-info {
+    padding: 12px;
+}
+
+.movie-info h3 {
+    margin: 0 0 8px;
+}
+
+.movie-genres {
+    font-size: 0.85rem;
+    color: #b5b5b5;
+    margin-bottom: 6px;
+}
+
+.movie-meta {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.movie-description {
+    font-size: 0.9rem;
+    color: #d0d0d0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.movie-meta {
+    margin-bottom: 20px;
+    color: #b5b5b5;
+    font-size: 15px;
+}
+
+.movie-details {
+    margin-top: 28px;
+}
+
+.detail-row {
+    margin-bottom: 18px;
+}
+
+.detail-row strong {
+    display: inline-block;
+    width: 90px;
+    color: white;
+}
+
+.detail-row span {
+    color: #cccccc;
+}
+
+.description {
+    margin-top: 8px;
+    color: #cccccc;
+    line-height: 1.7;
+}
