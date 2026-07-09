@@ -1,4 +1,5 @@
-from sqlalchemy import String, DateTime, func, Integer, text
+from datetime import date
+from sqlalchemy import String, DateTime, func, Integer, text, Date, JSON
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from app.constants.movie import MovieStatus
@@ -37,6 +38,37 @@ class Movie(Base):
 
     hls_playlist_path: Mapped[str | None] = mapped_column(
         String,
+        nullable=True,
+    )
+    # Metadata
+
+    release_date: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True,
+    )
+
+    language: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    genres: Mapped[list[str] | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    age_rating: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    director: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    cast: Mapped[list[str] | None] = mapped_column(
+        JSON,
         nullable=True,
     )
 

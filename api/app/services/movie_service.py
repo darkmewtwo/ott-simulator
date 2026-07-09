@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 import shutil
 import uuid
@@ -48,10 +49,17 @@ class MovieService:
         self,
         title: str,
         description: str,
+        release_date: date | None,
+        language: str | None,
+        genres: list[str] | None,
+        age_rating: str | None,
+        director: str | None,
+        cast: list[str] | None,
         file: UploadFile,
         poster_file: UploadFile | None = None,
     ):
         video_file = file
+
         if not video_file.filename:
             raise HTTPException(
                 status_code=400,
@@ -59,7 +67,6 @@ class MovieService:
             )
 
         video_extension = Path(video_file.filename).suffix
-
         video_filename = f"{uuid.uuid4()}{video_extension}"
 
         MEDIA_DIR.mkdir(exist_ok=True)
@@ -73,7 +80,6 @@ class MovieService:
 
         if poster_file and poster_file.filename:
             poster_extension = Path(poster_file.filename).suffix
-
             poster_filename = f"{uuid.uuid4()}{poster_extension}"
 
             poster_filepath = POSTER_DIR / poster_filename
@@ -86,6 +92,12 @@ class MovieService:
             description=description,
             filename=video_filename,
             poster_filename=poster_filename,
+            release_date=release_date,
+            language=language,
+            genres=genres,
+            age_rating=age_rating,
+            director=director,
+            cast=cast,
         )
 
         return self.repo.create_movie(movie)

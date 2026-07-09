@@ -164,11 +164,36 @@
 
         if (movie.transcoding_status === MovieStatus.READY) {
             card.innerHTML = `
-                <a href="/player.html?id=${movie.id}">
-                    ${poster}
-                    <h3>${movie.title}</h3>
-                </a>
-            `;
+    <a href="/player.html?id=${movie.id}">
+        ${poster}
+
+        <div class="movie-info">
+            <h3>${movie.title}</h3>
+
+            ${
+                movie.genres?.length
+                    ? `<div class="movie-genres">${movie.genres.join(" | ")}</div>`
+                    : ""
+                }
+
+            <div class="movie-meta">
+                ${[
+                    movie.language,
+                    movie.release_date?.substring(0, 4),
+                    movie.age_rating,
+                ]
+                    .filter(Boolean)
+                    .join(" | ")
+                }
+            </div>
+
+            ${movie.description
+                    ? `<p class="movie-description">${movie.description}</p>`
+                    : ""
+            }
+        </div>
+    </a>
+`;
         } else {
             card.classList.add("movie-disabled");
 
