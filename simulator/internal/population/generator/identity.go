@@ -44,7 +44,7 @@ func loadLines(path string) ([]string, error) {
 func NewIdentityGenerator(seed int64) (*IdentityGenerator, error) {
 	g := &IdentityGenerator{
 		generatedUsernames: make(map[string]struct{}),
-		rng:                rand.New(rand.NewSource(seed)),
+		rng:                rand.New(rand.NewPCG(seed)),
 	}
 
 	var err error
