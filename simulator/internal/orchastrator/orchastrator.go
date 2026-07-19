@@ -43,7 +43,8 @@ func (o *Orchastrator) Run() error {
 	if err := o.populationManager.Start(); err != nil {
 		return err
 	}
-	for user := range o.populationManager.Users() {
+	for injection := range o.populationManager.Users() {
+		user := injection.User
 		fmt.Println("recieved USER:")
 		fmt.Printf(
 			"%-20s %-20s %-25s %-30s %s\n",
