@@ -1,6 +1,6 @@
 package authentication
 
-type State struct {
+type AuthenticationState struct {
 	Registered bool
 	LoggedIn   bool
 

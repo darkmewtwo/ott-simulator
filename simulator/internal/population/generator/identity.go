@@ -2,6 +2,7 @@ package generator
 
 import (
 	"bufio"
+	"fmt"
 	"math/rand/v2"
 	"os"
 	"path/filepath"
@@ -41,10 +42,10 @@ func loadLines(path string) ([]string, error) {
 	return lines, scanner.Err()
 }
 
-func NewIdentityGenerator(seed int64) (*IdentityGenerator, error) {
+func newIdentityGenerator(rng *rand.Rand) (*IdentityGenerator, error) {
 	g := &IdentityGenerator{
 		generatedUsernames: make(map[string]struct{}),
-		rng:                rand.New(rand.NewPCG(seed)),
+		rng:                rng,
 	}
 
 	var err error
@@ -64,7 +65,7 @@ func NewIdentityGenerator(seed int64) (*IdentityGenerator, error) {
 	return g, nil
 }
 
-func (g *IdentityGenerator) GenerateIdentity() user.Identity {
+func (g *IdentityGenerator) generateIdentity() user.Identity {
 	first := g.randomFirstName()
 	last := g.randomLastName()
 
@@ -79,9 +80,53 @@ func (g *IdentityGenerator) GenerateIdentity() user.Identity {
 	}
 }
 
-func (g *IdentityGenerator) randomFirstName() string
-func (g *IdentityGenerator) randomLastName() string
+func (g *IdentityGenerator) randomFirstName() string {
+	return g.firstNames[g.rng.IntN(len(g.firstNames))]
+}
 
-func (g *IdentityGenerator) generateUsername(first, last string) string
-func (g *IdentityGenerator) generateEmail(username string) string
-func (g *IdentityGenerator) generatePassword(first, last string) string
+func (g *IdentityGenerator) randomLastName() string {
+	return g.lastNames[g.rng.IntN(len(g.lastNames))]
+}
+
+func (g *IdentityGenerator) randomEmailDomain() string {
+	return g.emailDomains[g.rng.IntN(len(g.emailDomains))]
+}
+
+func (g *IdentityGenerator) generateUsername(first, last string) string {
+	first = strings.ToLower(first)
+	last = strings.ToLower(last)
+
+	patterns := []string{
+		first + last,
+		first + "." + last,
+		first + "_" + last,
+		string(first[0]) + last,
+		last + first,
+	}
+
+	username := patterns[g.rng.IntN(len(patterns))]
+
+	if _, exists := g.generatedUsernames[username]; exists {
+		username = fmt.Sprintf("%s%d", username, g.rng.IntN(10000))
+	}
+
+	g.generatedUsernames[username] = struct{}{}
+
+	return username
+}
+
+func (g *IdentityGenerator) generateEmail(username string) string {
+	return fmt.Sprintf("%s@%s", username, g.randomEmailDomain())
+}
+
+func (g *IdentityGenerator) generatePassword(first, last string) string {
+	patterns := []string{
+		fmt.Sprintf("%s@123", first),
+		fmt.Sprintf("%s@2025", first),
+		fmt.Sprintf("%s%s@1", first, last),
+		fmt.Sprintf("%s#%d", last, g.rng.IntN(1000)),
+		fmt.Sprintf("%s%d!", first, g.rng.IntN(10000)),
+	}
+
+	return patterns[g.rng.IntN(len(patterns))]
+}
