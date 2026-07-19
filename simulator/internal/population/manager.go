@@ -14,6 +14,18 @@ import (
 
 const usersFile = "internal/population/simulation_data/registered_users.json"
 
+type InjectionType int
+
+const (
+	ReturningUser InjectionType = iota
+	NewUser
+)
+
+type Injection struct {
+	User *user.User
+	Type InjectionType
+}
+
 type Manager struct {
 	mu            sync.RWMutex
 	userGenerator *generator.UserGenerator
@@ -24,7 +36,7 @@ type Manager struct {
 	availableUsers []*user.User
 
 	// Stream consumed by the orchestrator
-	injectUserCh chan *user.User
+	injectUserCh chan *Injection
 
 	// Stream consumed by Manager for logged out users
 	logoutUserCh chan *user.User
@@ -46,7 +58,7 @@ func NewManager(seed1, seed2 uint64) (*Manager, error) {
 	m := &Manager{
 		userGenerator: userGenerator,
 		dirty:         false,
-		injectUserCh:  make(chan *user.User),
+		injectUserCh:  make(chan *Injection),
 		logoutUserCh:  make(chan *user.User),
 	}
 
@@ -216,7 +228,10 @@ func (m *Manager) injectionLoop() {
 		if m.shouldCreateNewUser() {
 			log.Println("[MANAGER] creating new user")
 			u := m.createUser()
-			m.injectUserCh <- u
+			m.injectUserCh <- &Injection{
+				User: u,
+				Type: NewUser,
+			}
 			continue
 		}
 
@@ -226,7 +241,10 @@ func (m *Manager) injectionLoop() {
 		}
 		log.Println("[MANAGER] selecting available user")
 		u := m.selectAvailableUser()
-		m.injectUserCh <- u
+		m.injectUserCh <- &Injection{
+			User: u,
+			Type: ReturningUser,
+		}
 	}
 }
 
@@ -253,7 +271,7 @@ func (m *Manager) cooldown(u *user.User) {
 	m.mu.Unlock()
 }
 
-func (m *Manager) Users() <-chan *user.User {
+func (m *Manager) Users() <-chan *Injection {
 	return m.injectUserCh
 }
 
