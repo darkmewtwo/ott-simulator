@@ -4,4 +4,4 @@
 streamer/tmp/*
 media/*
 snippet.py
-simulator/internal/population/simulation_data/simulated_data/*
+simulator/internal/population/simulation_data/simulation_data/*
