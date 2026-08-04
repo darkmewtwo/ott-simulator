@@ -21,7 +21,9 @@ func New(baseURL string) *Client {
 	}
 }
 
-func (c *Client) Get(path string, out any) error
+func (c *Client) Get(path string, out any) error {
+	return nil
+}
 
 func (c *Client) Post(path string, request any, response any) error {
 	body, err := json.Marshal(request)

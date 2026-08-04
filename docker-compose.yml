@@ -101,7 +101,8 @@ services:
 
     volumes:
       - ./simulator:/app
-    
+
+    # not required for simulator 
     environment:
       - DATABASE_URL=postgres://ott:ott@postgres:5432/ott?sslmode=disable
     
