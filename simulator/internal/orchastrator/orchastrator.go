@@ -2,8 +2,9 @@ package orchastrator
 
 import (
 	"fmt"
+	"log"
+	"simulator/internal/platform/session"
 	"simulator/internal/population"
-	"time"
 )
 
 type Orchastrator struct {
@@ -54,10 +55,22 @@ func (o *Orchastrator) Run() error {
 			user.Identity.Password,
 			user.Identity.Email,
 		)
-		time.Sleep(5 * time.Second)
+		// time.Sleep(5 * time.Second)
 
-		o.populationManager.ReturnedUsers() <- user
+		// o.populationManager.ReturnedUsers() <- user
 
+		go func(injection *population.Injection) {
+			session := session.NewSession(
+				injection.User,
+				injection.Type == population.NewUser,
+			)
+
+			if err := session.Run(); err != nil {
+				log.Printf("session failed for %s: %v", injection.User.Identity.Username, err)
+			}
+
+			o.populationManager.ReturnedUsers() <- injection.User
+		}(injection)
 	}
 	return nil
 }

@@ -35,6 +35,8 @@ func (c *Capability) Login(
 	if err != nil {
 		return nil, err
 	}
+	client.AccessToken = response.AccessToken
+	client.TokenType = response.TokenType
 
 	return &response, nil
 }
@@ -50,12 +52,13 @@ func (c *Capability) Register(
 	if err != nil {
 		return nil, err
 	}
-
 	return &response, nil
 }
 
 func (c *Capability) Logout(
 	client *httpclient.Client,
 ) error {
+	client.AccessToken = ""
+	client.TokenType = ""
 	return nil
 }

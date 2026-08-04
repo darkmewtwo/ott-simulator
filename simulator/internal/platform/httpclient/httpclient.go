@@ -8,8 +8,10 @@ import (
 )
 
 type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+	BaseURL     string
+	HTTPClient  *http.Client
+	AccessToken string
+	TokenType   string
 }
 
 func New(baseURL string) *Client {
