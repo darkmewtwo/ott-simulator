@@ -15,7 +15,7 @@ type Session struct {
 }
 
 func NewSession(user *user.User, registerFirst bool) *Session {
-	client := httpclient.New("http://localhost:8100")
+	client := httpclient.New("http://api:8100")
 	return &Session{
 		User:          user,
 		RegisterFirst: registerFirst,
