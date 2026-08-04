@@ -8,8 +8,10 @@ import (
 )
 
 type Client struct {
-	BaseURL    string
-	HTTPClient *http.Client
+	BaseURL     string
+	HTTPClient  *http.Client
+	AccessToken string
+	TokenType   string
 }
 
 func New(baseURL string) *Client {
@@ -19,7 +21,9 @@ func New(baseURL string) *Client {
 	}
 }
 
-func (c *Client) Get(path string, out any) error
+func (c *Client) Get(path string, out any) error {
+	return nil
+}
 
 func (c *Client) Post(path string, request any, response any) error {
 	body, err := json.Marshal(request)
