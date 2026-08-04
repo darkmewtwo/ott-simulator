@@ -1,11 +1,8 @@
 package authentication
 
-import httpclient "simulator/internal/platform/httpclient"
-
-type Authentication struct {
-	client *httpclient.Client
+type Capability struct {
 }
 
-func New() *Authentication {
-	return &Authentication{}
+func New() *Capability {
+	return &Capability{}
 }
