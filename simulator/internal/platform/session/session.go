@@ -1,6 +1,7 @@
 package session
 
 import (
+	"log"
 	"simulator/internal/platform/capability/authentication"
 	"simulator/internal/platform/httpclient"
 	"simulator/internal/user"
@@ -24,6 +25,8 @@ func NewSession(user *user.User, registerFirst bool) *Session {
 }
 
 func (s *Session) Run() error {
+	log.Println("SESSION: ", s.RegisterFirst, s.User.Identity.Username)
+	log.Println("USER STATE", s.User.MentalState)
 	if s.RegisterFirst {
 		if _, err := s.authentication.Register(s.HTTPClient, authentication.RegisterRequest{
 			Username: s.User.Identity.Username,
