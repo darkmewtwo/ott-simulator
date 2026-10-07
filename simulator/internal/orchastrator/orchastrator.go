@@ -3,12 +3,15 @@ package orchastrator
 import (
 	"fmt"
 	"log"
+	"math/rand/v2"
 	"simulator/internal/platform/session"
 	"simulator/internal/population"
+	"simulator/internal/population/generator"
 )
 
 type Orchastrator struct {
-	populationManager *population.Manager
+	populationManager    *population.Manager
+	mentalStateGenerator *generator.MentalStateGenerator
 }
 
 func NewOrchastrator(seed1, seed2 uint64) (*Orchastrator, error) {
@@ -17,9 +20,11 @@ func NewOrchastrator(seed1, seed2 uint64) (*Orchastrator, error) {
 	if err != nil {
 		return nil, err
 	}
+	mentalStateRNG := rand.New(rand.NewPCG(seed1+1, seed2+1))
 
 	return &Orchastrator{
-		populationManager: populationManager,
+		populationManager:    populationManager,
+		mentalStateGenerator: generator.NewMentalStateGenerator(mentalStateRNG),
 	}, nil
 }
 
@@ -46,6 +51,8 @@ func (o *Orchastrator) Run() error {
 	}
 	for injection := range o.populationManager.Users() {
 		user := injection.User
+		user.MentalState = o.mentalStateGenerator.Generate()
+
 		fmt.Println("recieved USER:")
 		fmt.Printf(
 			"%-20s %-20s %-25s %-30s %s\n",
@@ -60,6 +67,7 @@ func (o *Orchastrator) Run() error {
 		// o.populationManager.ReturnedUsers() <- user
 
 		go func(injection *population.Injection) {
+			log.Println("ORCHASTRATOR: USER TYPE", injection.Type, population.NewUser, injection.Type == population.NewUser)
 			session := session.NewSession(
 				injection.User,
 				injection.Type == population.NewUser,
