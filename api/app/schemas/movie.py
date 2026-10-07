@@ -28,6 +28,7 @@ class MovieBaseResponse(BaseModel):
     age_rating: str | None
     director: str | None
     cast: list[str] | None
+    duration_seconds: int
 
     @field_serializer("created_at")
     def serialize_created_at(self, value: datetime):
