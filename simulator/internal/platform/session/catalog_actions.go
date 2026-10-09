@@ -1,48 +1,20 @@
 package session
 
-import (
-	"fmt"
+import "simulator/internal/cognition"
 
-	"simulator/internal/cognition"
-	"simulator/internal/platform/capability/catalog"
-)
-
-type CatalogActionResult struct {
-	SelectedMovie *catalog.MovieDetailsResponse
-	EndSession    bool
-}
-
-type CatalogActionHandler func(
-	candidate catalog.MovieResponse,
-) (CatalogActionResult, error)
+type CatalogActionHandler func()
 
 type CatalogActionMapper struct {
 	handlers map[cognition.CatalogAction]CatalogActionHandler
 }
 
 func NewCatalogActionMapper(s *Session) *CatalogActionMapper {
-	mapper := &CatalogActionMapper{
-		handlers: make(
-			map[cognition.CatalogAction]CatalogActionHandler,
-		),
+	return &CatalogActionMapper{
+		handlers: map[cognition.CatalogAction]CatalogActionHandler{
+			cognition.ActionSelectMovie:      s.selectMovie,
+			cognition.ActionContinueBrowsing: s.continueBrowsing,
+		},
 	}
-
-	mapper.Register(
-		cognition.ActionSelectMovie,
-		s.selectMovie,
-	)
-
-	mapper.Register(
-		cognition.ActionContinueBrowsing,
-		s.continueBrowsing,
-	)
-
-	mapper.Register(
-		cognition.ActionLeaveSession,
-		s.leaveSession,
-	)
-
-	return mapper
 }
 
 func (m *CatalogActionMapper) Register(
@@ -52,59 +24,22 @@ func (m *CatalogActionMapper) Register(
 	m.handlers[action] = handler
 }
 
-func (m *CatalogActionMapper) Execute(
-	action cognition.CatalogAction,
-	candidate catalog.MovieResponse,
-) (CatalogActionResult, error) {
-	handler, exists := m.handlers[action]
-	if !exists || handler == nil {
-		return CatalogActionResult{}, fmt.Errorf(
-			"unsupported catalog action: %q",
-			action,
-		)
+func (m *CatalogActionMapper) Execute(action cognition.CatalogAction) {
+	if handler := m.handlers[action]; handler != nil {
+		handler()
 	}
-
-	return handler(candidate)
 }
 
-func (s *Session) selectMovie(
-	candidate catalog.MovieResponse,
-) (CatalogActionResult, error) {
-	movie, err := s.catalog.GetMovie(
-		s.HTTPClient,
-		candidate.ID,
-	)
-	if err != nil {
-		return CatalogActionResult{}, err
-	}
-
+func (s *Session) selectMovie() {
 	cognition.ApplyMentalStateCost(
 		&s.User.MentalState,
 		cognition.CostForAction(cognition.ActionSelectMovie),
 	)
-
-	return CatalogActionResult{
-		SelectedMovie: movie,
-	}, nil
 }
 
-func (s *Session) continueBrowsing(
-	_ catalog.MovieResponse,
-) (CatalogActionResult, error) {
+func (s *Session) continueBrowsing() {
 	cognition.ApplyMentalStateCost(
 		&s.User.MentalState,
-		cognition.CostForAction(
-			cognition.ActionContinueBrowsing,
-		),
+		cognition.CostForAction(cognition.ActionContinueBrowsing),
 	)
-
-	return CatalogActionResult{}, nil
-}
-
-func (s *Session) leaveSession(
-	_ catalog.MovieResponse,
-) (CatalogActionResult, error) {
-	return CatalogActionResult{
-		EndSession: true,
-	}, nil
 }
