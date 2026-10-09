@@ -3,6 +3,7 @@ package session
 import (
 	"log"
 	"simulator/internal/platform/capability/authentication"
+	"simulator/internal/platform/capability/catalog"
 	"simulator/internal/platform/httpclient"
 	"simulator/internal/user"
 	"time"
@@ -13,6 +14,7 @@ type Session struct {
 	RegisterFirst  bool
 	HTTPClient     *httpclient.Client
 	authentication *authentication.Capability
+	catalog        *catalog.Capability
 }
 
 func NewSession(user *user.User, registerFirst bool) *Session {
@@ -42,6 +44,13 @@ func (s *Session) Run() error {
 	}); err != nil {
 		return err
 	}
+
+	resp, err := s.catalog.ListMovies(s.HTTPClient)
+
+	if err != nil {
+		return err
+	}
+	log.Println("LIST MOVIES:", resp)
 
 	time.Sleep(5 * time.Second)
 
