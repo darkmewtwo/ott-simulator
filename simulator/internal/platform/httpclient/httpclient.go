@@ -22,6 +22,28 @@ func New(baseURL string) *Client {
 }
 
 func (c *Client) Get(path string, out any) error {
+	req, err := http.NewRequest(http.MethodGet, c.BaseURL+path, nil)
+	if err != nil {
+		return err
+	}
+	if c.AccessToken != "" {
+		tokenType := c.TokenType
+		if tokenType == "" {
+			tokenType = "Bearer"
+		}
+		req.Header.Set("Authorization", tokenType+" "+c.AccessToken)
+	}
+	resp, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed: %s", resp.Status)
+	}
+	if out != nil {
+		return json.NewDecoder(resp.Body).Decode(out)
+	}
 	return nil
 }
 
